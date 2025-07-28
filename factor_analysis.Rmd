@@ -1,0 +1,169 @@
+```{r}
+# Load dataset
+library(readxl)
+heart_failure <- read_excel("C:/Users/lenovo/Downloads/heart_failure_clinical_records.xlsx")
+View(heart_failure)
+```
+
+```{r}
+# Correlation Matrix Inspection
+library(GGally)
+heartt_data<-heart_failure[c(2,4,6,8,9,10,13)] # Selecting relevant numeric variables
+ggpairs(heartt_data) # Scatterplot matrix
+```
+
+```{r}
+# Pearson correlation with p-values (matrix input)
+library("Hmisc") 
+rcorr(as.matrix(heartt_data),type="pearson") 
+```
+
+```{r}
+# Visual correlation matrix
+library(corrplot)
+corrplot(cor(heartt_data)) 
+```
+
+```{r}
+# PCA Applicability Tests (KMO, Bartlett's Test)
+library(psych)
+KMO(heartt_data) # KMO and MSA; diagonal of the anti-image matrix
+```
+
+```{r}
+# Bartlett's test of sphericity
+cortest.bartlett(cor(heartt_data),nrow(heartt_data)) #Bartlett test 
+```
+
+```{r}
+# Principal Component Analysis using prcomp
+fit.pca <- prcomp(heartt_data, scale=TRUE) 
+fit.pca$rotation # Loadings
+fit.pca$x   #scores
+```
+
+```{r}
+# Determine number of components
+summary(fit.pca) # Variance explained
+(fit.pca$sdev)^2 # Eigenvalues (select those >1)
+```
+
+```{r}
+#Scree plot
+plot(fit.pca)
+plot(fit.pca,type="line")
+```
+
+```{r}
+# Select first two components
+fit.pca$rotation[,1:2] #loadings
+```
+
+```{r}
+# Manual component equations:
+#Y1= 0.06age-0.19creatinine_phosphokinase+0.04ejection_fraction-0.67platelets-0.66serum_creatinine+0.17serum_sodium+0.15time
+#Y2= -0.09age+0.21creatinine_phosphokinase+0.62ejection_fraction+0.20platelets+0.005serum_creatinine+0.63serum_sodium+0.32time
+```
+
+```{r}
+# Factor Loadings (multiplied by square root of eigenvalues)
+faktor_yukleri<-t(fit.pca$rotation)*fit.pca$sdev # koklambda ile carpılmıs hali bu da bizi faktore goturuyor
+faktor_yukleri #asal bileşenler
+```
+
+```{r}
+# Naming the scores by observation ID
+row.names(fit.pca$x)<-heart_failure$id #skorları isimlendirme 
+```
+
+```{r}
+# Saving component scores to the dataset
+heart_failure$comp1=fit.pca$x[,1] 
+heart_failure$comp2=fit.pca$x[,2] 
+```
+
+```{r}
+# Creating an index by summing the first two components
+heart_failure$index=heart_failure$comp1+heart_failure$comp2
+indeks<-sort(heart_failure$index, decreasing = T)
+head(indeks)# Gözlem sayısı çok olduğunda kullanılablir.
+```
+
+```{r}
+library(factoextra)
+fviz_pca_var(fit.pca,col.var="steelblue",
+             repel = TRUE 
+)
+```
+
+```{r}
+# FACTOR ANALYSIS
+# Selecting relevant variables
+heart_factor <- heart_failure[, 5:13]
+heart_factor <- na.omit(heart_factor) # remove missing observations
+```
+
+```{r}
+# CORRELATION MATRIX
+library(corrplot)
+library(matlib)
+corrplot(cor(heart_factor)) # correlation plot
+correlation_matrix <- cor(heart_factor)
+correlation_matrix
+```
+
+```{r}
+library("Hmisc") # to see significance levels (2-tailed results)
+rcorr(as.matrix(heart_factor), type="pearson") # must be in matrix format
+```
+
+```{r}
+# Inverse of the correlation matrix (used for VIF)
+inv_corr <- inv(correlation_matrix)
+colnames(inv_corr) <- rownames(inv_corr) <- colnames(correlation_matrix)
+inv_corr
+```
+
+```{r}
+# TESTING FACTOR ANALYSIS SUITABILITY (KMO, Anti-Image, Bartlett’s Test)
+library(psych)
+KMO(heart_factor) # KMO and anti-image matrix diagonal
+```
+
+```{r}
+# Bartlett's Test of Sphericity
+cortest.bartlett(cor(heart_factor), nrow(heart_factor))
+```
+
+```{r}
+# FACTOR ANALYSIS using Principal Component Method (Eigenvalue approach)
+fa_model <- principal(heart_factor, nfactors = 3, rotate = "none")
+```
+
+```{r}
+# Factor loadings
+print(fa_model$loadings, digits = 3, cutoff = .0, sort = TRUE)
+
+# Communality values for all variables
+fa_model$communality
+
+# Squared loadings for each factor (used for communality calculation)
+fa_model$loadings[,]^2
+rowSums(fa_model$loadings[,]^2) # confirm communality
+
+# Proportion of variance explained by each factor
+var_explained <- colSums(fa_model$loadings[,]^2) / ncol(heart_factor)
+var_explained
+sum(var_explained) # total variance explained by 3 factors
+
+# SCREE PLOT
+plot(fa_model$values, type = "b", main = "Scree Plot", xlab = "Number of Factors", ylab = "Eigenvalues")
+
+# RESIDUAL CORRELATION MATRIX (to assess model fit)
+residual_corr <- fa_model$residual
+residual_corr
+
+# Number of residuals < 0.05 (indicates good model fit)
+length(residual_corr[abs(residual_corr) < 0.05])
+
+
