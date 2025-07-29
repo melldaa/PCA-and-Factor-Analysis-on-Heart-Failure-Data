@@ -1,6 +1,5 @@
 # Principal Component Analysis (PCA) and Factor Analysis on Heart Failure Clinical Dataset
 
-This repository contains a statistical exploration of the [Heart Failure Clinical Records Dataset](https://www.kaggle.com/datasets/andrewmvd/heart-failure-clinical-data) using Principal Component Analysis (PCA) and Exploratory Factor Analysis (EFA).
 
 ---
 
