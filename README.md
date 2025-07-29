@@ -21,22 +21,22 @@ The project applies PCA and factor analysis to uncover latent structures and red
 
 ## 📦 R Packages Used
 
-library(readxl)
-library(GGally)
-library(Hmisc)
-library(corrplot)
-library(psych)
-library(matlib)
+- library(readxl)
+- library(GGally)
+- library(Hmisc)
+- library(corrplot)
+- library(psych)
+- library(matlib)
 
 ---
 
 ## 🧪 Key Outputs
 
-Correlation heatmap with significance levels
-Scree plot for eigenvalues
-PCA loadings and component scores
-Factor loadings table and communalities
-Evaluation of residual correlations
+- Correlation heatmap with significance levels
+- Scree plot for eigenvalues
+- PCA loadings and component scores
+- Factor loadings table and communalities
+- Evaluation of residual correlations
 
 ---
 
