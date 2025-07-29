@@ -143,27 +143,40 @@ fa_model <- principal(heart_factor, nfactors = 3, rotate = "none")
 ```{r}
 # Factor loadings
 print(fa_model$loadings, digits = 3, cutoff = .0, sort = TRUE)
+```
 
+```{r}
 # Communality values for all variables
 fa_model$communality
+```
 
+```{r}
 # Squared loadings for each factor (used for communality calculation)
 fa_model$loadings[,]^2
 rowSums(fa_model$loadings[,]^2) # confirm communality
+```
 
+```{r}
 # Proportion of variance explained by each factor
 var_explained <- colSums(fa_model$loadings[,]^2) / ncol(heart_factor)
 var_explained
 sum(var_explained) # total variance explained by 3 factors
+```
 
+```{r}
 # SCREE PLOT
 plot(fa_model$values, type = "b", main = "Scree Plot", xlab = "Number of Factors", ylab = "Eigenvalues")
+```
 
+```{r}
 # RESIDUAL CORRELATION MATRIX (to assess model fit)
 residual_corr <- fa_model$residual
 residual_corr
+```
 
+```{r}
 # Number of residuals < 0.05 (indicates good model fit)
 length(residual_corr[abs(residual_corr) < 0.05])
+```
 
 
